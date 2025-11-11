@@ -49,9 +49,33 @@ describe('AllPerks page (Directory)', () => {
   - verify the record is displayed
   - verify the summary text reflects the number of matching perks
   */
+// tests/allPerksPage.test.jsx (Modified Test)
 
-  test('lists public perks and responds to merchant filtering', async () => {
-    // This will always fail until the TODO above is implemented.
-    expect(true).toBe(false);
+test('lists public perks and responds to merchant filtering', async () => {
+  const seededPerk = global.__TEST_CONTEXT__.seededPerk;
+  const seededMerchantValue = seededPerk.merchant.name; 
+
+  renderWithRouter(
+    <Routes>
+      <Route path="/explore" element={<AllPerks />} />
+    </Routes>,
+    { initialEntries: ['/explore'] }
+  );
+
+  const seededPerkTitle = seededPerk.title;
+  await screen.findByText(seededPerkTitle); 
+
+  const merchantFilterSelect = screen.getByRole('combobox'); 
+
+  fireEvent.change(merchantFilterSelect, { target: { value: seededMerchantValue } });
+
+  await waitFor(() => {
+    expect(screen.getByText(seededPerk.title)).toBeInTheDocument();
   });
+
+  const summaryText = screen.getByText(/showing/i);
+  expect(summaryText).toBeInTheDocument();
+  expect(summaryText).toHaveTextContent('Showing');
+});
+
 });
